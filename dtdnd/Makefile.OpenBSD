@@ -1,0 +1,31 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/dtdnd
+SRCFILES	= $(SRCDIR)/buff.c $(SRCDIR)/demo.c $(SRCDIR)/file.c $(SRCDIR)/icon.c $(SRCDIR)/text.c
+APPS		= dtdnddemo
+APPDEFAULTS	= Dtdnddemo
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include -I/usr/local/include
+X11INCLUDE	= -I/usr/X11R6/include
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -lDtSvc -ltt -L/usr/local/lib -lXm
+X11LIBS		= -L/usr/X11R6/lib -lXt -lX11
+SYSLIBS		= -pthread
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(APPS)
+
+dtdnddemo: $(SRCFILES) $(APPDEFAULTS)
+	$(CC) -o $@ $(SRCFILES) $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+$(APPDEFAULTS): $(SRCDIR)/$(APPDEFAULTS)
+	cp $(SRCDIR)/$(APPDEFAULTS) $@
+
+clean:
+	rm -rf $(APPS) $(APPDEFAULTS)
+
+test: $(APPS)
+	objdump -p dtdnddemo | grep NEEDED | grep "libDtSvc.so.2.1$$"
+	objdump -p dtdnddemo | grep RUNPATH | grep $(CDE_INSTALLATION_TOP)/lib

@@ -1,0 +1,19 @@
+PROGRAM		= $(CDE_INSTALLATION_TOP)/bin/dtinfo
+
+all:
+	for d in DtHelp DtTerm DtWidget DtSvc tt csa; \
+	do \
+		find $(CDE_INSTALLATION_TOP)/lib -type f -name "lib$$d.so*" | while read N; \
+		do \
+			if test ! -h lib$$d.so; \
+			then \
+				ln -s "$$N" lib$$d.so; \
+			fi; \
+		done; \
+	done
+
+clean:
+	rm -rf lib*.so
+
+test: $(PROGRAM)
+	objdump -p $(PROGRAM) | grep NEEDED | grep "libDtSvc.so.2.1$$"

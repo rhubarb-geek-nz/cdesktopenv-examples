@@ -1,0 +1,26 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/dtscreen
+APPS		= screensaver
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include
+X11INCLUDE	= 
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -lDtSvc -ltt -lXm
+X11LIBS		= -lX11
+SYSLIBS		= -pthread -lm
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(APPS)
+
+screensaver: $(SRCDIR)/screensaver.c
+	$(CC) -o $@ $(SRCDIR)/screensaver.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+clean:
+	rm -rf $(APPS)
+
+test: $(APPS)
+	objdump -p screensaver | grep NEEDED | grep "libDtSvc.so.2$$"
+	objdump -p screensaver | grep "$$(echo RPATH ; echo RUNPATH)" | grep $(CDE_INSTALLATION_TOP)/lib

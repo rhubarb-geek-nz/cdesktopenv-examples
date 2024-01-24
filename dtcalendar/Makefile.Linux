@@ -1,0 +1,26 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/dtcalendar
+APPS		= attributes
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include
+X11INCLUDE	= 
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -lcsa
+X11LIBS		= 
+SYSLIBS		= -pthread
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(APPS)
+
+attributes: $(SRCDIR)/attributes.c
+	$(CC) -o $@ $(SRCDIR)/attributes.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+clean:
+	rm -rf $(APPS)
+
+test: $(APPS)
+	objdump -p attributes | grep NEEDED | grep "libcsa.so.2$$"
+	objdump -p attributes | grep "$$(echo RPATH ; echo RUNPATH)" | grep $(CDE_INSTALLATION_TOP)/lib

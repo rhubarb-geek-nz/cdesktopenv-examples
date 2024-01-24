@@ -1,0 +1,26 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/dtterm
+APPS		= term
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include
+X11INCLUDE	= 
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -lDtTerm -lDtHelp -lDtSvc -ltt -lXm
+X11LIBS		= -lXt -lX11
+SYSLIBS		= -pthread
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(APPS)
+
+term: $(SRCDIR)/term.c
+	$(CC) -o $@ $(SRCDIR)/term.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+clean:
+	rm -rf $(APPS)
+
+test: $(APPS)
+	objdump -p term | grep NEEDED | grep "libDtTerm.so.2$$"
+	objdump -p term | grep "$$(echo RPATH ; echo RUNPATH)" | grep $(CDE_INSTALLATION_TOP)/lib

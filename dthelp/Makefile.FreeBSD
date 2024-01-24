@@ -1,0 +1,34 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/dthelp
+SRCFILES	= $(SRCDIR)/Main.c $(SRCDIR)/HelpCache.c $(SRCDIR)/HourGlass.c
+PROGRAM		= dthelpdemo
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include -I/usr/local/include
+X11INCLUDE	= 
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -lDtHelp -lDtSvc -ltt -L/usr/local/lib -lXm
+X11LIBS		= -lXt -lX11
+SYSLIBS		= -pthread
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(PROGRAM) volume
+
+$(PROGRAM): $(SRCFILES)
+	$(CC) -o $@ $(SRCFILES)  $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+clean:
+	rm -rf $(PROGRAM)
+	set -e ; cd help; $(MAKE) clean
+
+test: $(PROGRAM)
+	objdump -p $(PROGRAM) | grep NEEDED | grep "libDtHelp.so.2$$"
+	objdump -p $(PROGRAM) | grep RUNPATH | grep $(CDE_INSTALLATION_TOP)/lib
+
+volume:
+	set -e ; cd help; $(MAKE)
+
+run: $(SRCDIR)/helpdemoHelpEnv.sh $(PROGRAM)
+	. $(SRCDIR)/helpdemoHelpEnv.sh ; ./$(PROGRAM)

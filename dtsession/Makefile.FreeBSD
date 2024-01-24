@@ -1,0 +1,26 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/dtsession
+APPS		= session
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include -I/usr/local/include
+X11INCLUDE	= 
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -lDtSvc -L/usr/local/lib -lXm
+X11LIBS		= -lXt -lX11
+SYSLIBS		= -pthread
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(APPS)
+
+session: $(SRCDIR)/session.c
+	$(CC) -o $@ $(SRCDIR)/session.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+clean:
+	rm -rf $(APPS)
+
+test: $(APPS)
+	objdump -p session | grep NEEDED | grep "libDtSvc.so.2$$"
+	objdump -p session | grep RUNPATH | grep $(CDE_INSTALLATION_TOP)/lib

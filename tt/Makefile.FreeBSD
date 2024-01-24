@@ -1,0 +1,26 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/tt
+APPS		= broadcast
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include -I/usr/local/include
+X11INCLUDE	= 
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -ltt -L/usr/local/lib -lXm
+X11LIBS		= -lXt
+SYSLIBS		= -pthread
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(APPS)
+
+broadcast: $(SRCDIR)/broadcast.c
+	$(CC) -o $@ $(SRCDIR)/broadcast.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+clean:
+	rm -rf $(APPS)
+
+test: $(APPS)
+	objdump -p broadcast | grep NEEDED | grep "libtt.so.2$$"
+	objdump -p broadcast | grep RUNPATH | grep $(CDE_INSTALLATION_TOP)/lib

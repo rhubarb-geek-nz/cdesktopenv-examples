@@ -1,0 +1,31 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/dtwsm
+APPS		= occupy wsinfo
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include
+X11INCLUDE	= 
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -lDtSvc -ltt -lXm
+X11LIBS		= -lXt -lX11
+SYSLIBS		= -pthread
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(APPS)
+
+occupy: $(SRCDIR)/occupy.c
+	$(CC) -o $@ $(SRCDIR)/occupy.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+wsinfo: $(SRCDIR)/wsinfo.c
+	$(CC) -o $@ $(SRCDIR)/wsinfo.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+clean:
+	rm -rf $(APPS)
+
+test: $(APPS)
+	objdump -p occupy | grep NEEDED | grep "libDtSvc.so.2$$"
+	objdump -p occupy | grep "$$(echo RPATH ; echo RUNPATH)" | grep $(CDE_INSTALLATION_TOP)/lib
+	objdump -p wsinfo | grep NEEDED | grep "libDtSvc.so.2$$"
+	objdump -p wsinfo | grep "$$(echo RPATH ; echo RUNPATH)" | grep $(CDE_INSTALLATION_TOP)/lib

@@ -1,0 +1,7 @@
+PROGRAM		= $(CDE_INSTALLATION_TOP)/bin/dtinfo
+
+all clean:
+
+test: $(PROGRAM)
+	objdump -p $(PROGRAM) | grep NEEDED | grep "libDtSvc.so.2.1$$"
+

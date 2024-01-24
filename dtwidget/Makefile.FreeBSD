@@ -1,0 +1,31 @@
+SRCDIR		= $(CDE_INSTALLATION_TOP)/examples/dtwidget
+APPS		= controls editor
+
+DTINCLUDE	= -I$(CDE_INSTALLATION_TOP)/include -I/usr/local/include
+X11INCLUDE	= 
+
+INCLUDES	= $(DTINCLUDE) $(X11INCLUDE)
+
+DTLIBS		= -L$(CDE_INSTALLATION_TOP)/lib -lDtWidget -lDtSvc -ltt -L/usr/local/lib -lXm
+X11LIBS		= -lXt -lX11
+SYSLIBS		= -pthread
+
+LIBRARIES	= $(DTLIBS) $(X11LIBS) $(SYSLIBS)
+LDFLAGS		= -Wl,-rpath,$(CDE_INSTALLATION_TOP)/lib
+
+all: $(APPS)
+
+controls: $(SRCDIR)/controls.c
+	$(CC) -o $@ $(SRCDIR)/controls.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+editor: $(SRCDIR)/editor.c
+	$(CC) -o $@ $(SRCDIR)/editor.c $(INCLUDES) $(LIBRARIES) $(LDFLAGS)
+
+clean:
+	rm -rf $(APPS)
+
+test: $(APPS)
+	objdump -p controls | grep NEEDED | grep "libDtWidget.so.2$$"
+	objdump -p controls | grep RUNPATH | grep $(CDE_INSTALLATION_TOP)/lib
+	objdump -p editor | grep NEEDED | grep "libDtWidget.so.2$$"
+	objdump -p editor | grep RUNPATH | grep $(CDE_INSTALLATION_TOP)/lib
